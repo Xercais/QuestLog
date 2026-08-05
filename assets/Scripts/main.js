@@ -11,14 +11,13 @@ let checkbox_states = localStorage.getItem('checkbox_state');
 //Level
 //===========================
 let level = 1;
-levelDisplay.textContent = "Level: " + level;
 
 //===========================
 //XP
 //===========================
 let xp = 0;
 load_xp();
-xpDisplay.textContent = "XP: " + xp;
+update_xp_display();
 
 //===========================
 //Streak
@@ -27,8 +26,9 @@ let streak = 0;
 let bestStreak = 0;
 load_streak();
 check_for_reset();
-streakDisplay.textContent = "Streak: " + streak;
-bestStreakDisplay.textContent = "Best Streak: " + bestStreak;
+update_streak_display();
+update_bestStreak_display();
+
  
 //===========================
 //Startup

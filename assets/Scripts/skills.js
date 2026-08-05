@@ -22,37 +22,24 @@ let skills = {
 }
 
 //===========================
-//Load
-//===========================
-
-function load_skills(){
-    stored_skills = localStorage.getItem('skills')
-    if (stored_skills !== null){
-        skills = JSON.parse(stored_skills)
-        let keys = Object.keys(skills)
-        for (skillName of keys){
-            update_skill_levels(skillName)
-        }
-    }
-}
-
-//===========================
 //Calculations
 //===========================
 
+//skillName is acquired from the checkboxes, function can be found in initialize_quest_listeners() in questTracking.js
 function increase_skill_xp(skillName, xp_to_add){
     skills[skillName].xp += xp_to_add;
-    localStorage.setItem('skills', JSON.stringify(skills))
-    update_skill_levels(skillName);
+    save_skills();
 }
 
-function update_skill_levels(skillName){
-    skills[skillName].level = calculate_level(skills[skillName].xp, 5)
-    document.querySelector("#" + skillName + "-level").textContent = `${title_case_skill_name(skillName)}: lvl ${skills[skillName].level}`
-}
-
-function title_case_skill_name(skillName){
-    firstLetter = skillName.charAt(0).toUpperCase();
-    restOfWord = skillName.slice(1);
-    return firstLetter + restOfWord;
+function get_all_skill_info(skills){
+    let skill_data = [];
+    let keys = Object.keys(skills);
+    for (skillName of keys){
+        skill_entry = {};
+        skill_entry.name = skillName;
+        skill_entry.xp = skills[skillName].xp;
+        skill_entry.level = calculate_level(skills[skillName].xp, 5);
+        skill_data.push(skill_entry);
+    }
+    return skill_data;
 }
