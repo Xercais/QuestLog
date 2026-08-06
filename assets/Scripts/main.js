@@ -33,7 +33,11 @@ update_bestStreak_display();
 //===========================
 //Startup
 //===========================
-initialize_quest_listeners();
 load_skills();
+render_all_skills(get_all_skill_info(skills));
+ensure_quest_data_exists(skills);
+render_quest_board(get_all_quest_data(quests));
+initialize_quest_listeners();
+
 load_checkbox_states();
 
