@@ -29,6 +29,7 @@ function check_for_reset(){
 //also checks if the user successfully completed a day and earns a streak increment
 function daily_reset(){
     let fresh_checkboxes = [];
+    let checkboxes = document.querySelectorAll('.quest-boxes input')
     for (let i = 0; i < checkboxes.length; i++){
         fresh_checkboxes.push(false);
     }

@@ -69,7 +69,7 @@ function render_quest_section(questdata){
     let questSection = document.createElement('section');
     questSection.classList.add('quest-section');
 
-    let questTitle = document.createElement('h3');
+    let questTitle = document.createElement('h2');
     questTitle.textContent = title_case_skill_name(questdata.name);
 
     let questboxesSection = document.createElement('ul');
@@ -81,7 +81,6 @@ function render_quest_section(questdata){
     questSection.append(questTitle);
     questSection.append(questboxesSection);
 
-    console.log(questdata)
     return questSection;
 }
 
@@ -91,5 +90,10 @@ function render_quest_board(questCollection){
     for (let i = 0; i < questCollection.length; i++){
         questContainer.append(render_quest_section(questCollection[i]));
     }
-    console.log(questCollection)
+}
+
+function failure_popup(reason){
+    let failure_popup = document.getElementById('failed-to-add-skill')
+    failure_popup.textContent = `Failed: ${reason}`
+    failure_popup.style.display = 'block';
 }

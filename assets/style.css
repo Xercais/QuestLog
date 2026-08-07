@@ -2,6 +2,14 @@
     text-align: center;
 }
 
+#title-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 150px;
+}
+
 .stats-bar {
     display: flex;
     flex-direction: row;
@@ -12,8 +20,10 @@
 
 .quest-board {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 650px;
 }
 
 .skill-section {
@@ -27,4 +37,50 @@
     display: flex;
     justify-content: flex-start;
     gap: 5px;
+}
+
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+#add-skill-popup {
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+    border: 2px solid black;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: white;
+    z-index: 101;
+}
+
+#add-skill-popup h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.popup-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.hidden {
+    display: none;
 }

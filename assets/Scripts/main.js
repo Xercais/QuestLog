@@ -34,6 +34,7 @@ update_bestStreak_display();
 //Startup
 //===========================
 load_skills();
+add_skills_logic();
 render_all_skills(get_all_skill_info(skills));
 ensure_quest_data_exists(skills);
 render_quest_board(get_all_quest_data(quests));

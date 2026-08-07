@@ -11,7 +11,6 @@ let quests = {};
 
 function initialize_quest_listeners(){
     const checkboxes = document.querySelectorAll('.quest-boxes input')
-    console.log(checkboxes.length);
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function(event){
             if (this.checked){
