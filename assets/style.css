@@ -18,35 +18,74 @@
     gap: 80px;
 }
 
+/*Applies flexbox positioning to the quests section and skill progress section, and creates space between them */
 .quest-board {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 650px;
+    gap: 450px;
 }
 
-.skill-section {
+.skill-card {
+    border: 2px solid black;
+    border-radius: 8px;
+    padding: 0.2rem;
+    flex: 0 0 175px;
+}
+
+.skill-card p {
+    margin: 0.5rem 0.5rem;
+}
+
+.skill-card h2 {
+    border-bottom: 4px solid black;
+}
+
+#skill-progress {
+    margin-top: 1rem;
+}
+
+#skills-container {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 450px;
+    max-height: 700px;
 }
 
+.quest-section {
+    border: 2px solid black;
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.quest-section h2 {
+    border-bottom: 4px solid black;
+}
+
+#quests-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 450px;
+}
 .quest-boxes {
     list-style-type: none;
     padding: 0;
     display: flex;
     justify-content: flex-start;
-    gap: 5px;
+    gap: 0.5rem;
 }
 
-#popup-overlay {
+.overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.3);
     z-index: 100;
 }
 
-#add-skill-popup {
+.popup {
     position: fixed;
     justify-content: center;
     align-items: center;
@@ -60,9 +99,11 @@
     border-radius: 8px;
     background-color: white;
     z-index: 101;
+
+    max-width: 400px;
 }
 
-#add-skill-popup h2 {
+.popup h2 {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -83,4 +124,32 @@
 }
 .hidden {
     display: none;
+}
+
+.manage-skill-skill-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.manage-skill-skill-row p {
+    width: 80px;
+    font-size: 18px;
+}
+
+.skill-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 5px
+}
+
+.failure-message{
+    width: 250px;
+    word-wrap: break-word;
 }

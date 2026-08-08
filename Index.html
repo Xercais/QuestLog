@@ -10,8 +10,8 @@
     <header>
         <div id="title-section">
             <h1 id="title-card">Questlog</h1>
-            <button id="add-skill-button">
-            + Add Skill
+            <button id="manage-skills">
+                Manage Skills
             </button>
         </div>
         <div class="stats-bar">
@@ -28,12 +28,22 @@
             
         </section>
         <section>
-            <h2>Skill Progress</h2>
+            <div id="skill-progress">
+                <h2>Skill Progress</h2>
+            </div>
             <div id="skills-container"></div>
         </section>
     </main>
-    <div id="popup-overlay" class="hidden"></div>
-    <div id="add-skill-popup" class="hidden">
+        <div id="manage-skills-overlay" class="hidden overlay"></div>
+        <div id="manage-skills-popup" class="hidden popup">
+            <div class="bottom-buttons">
+                <button id="add-skill-button">
+                    + Add Skill
+                </button>
+            </div>
+        </div>
+    <div id="popup-overlay" class="hidden overlay"></div>
+    <div id="add-skill-popup" class="hidden popup">
         <h2>Add New Skill</h2>
         <div class="popup-label">
             <label for="skill-input">
@@ -53,7 +63,8 @@
                 Cancel
             </button>
         </div>
-        <h3 id="failed-to-add-skill" hidden></h3>
+        <h3 id="failed-to-add-skill" class="hidden">Failed:</h3>
+        <h3 id="fail-reason" class="hidden failure-message"></h3>
     </div>
     <script src="assets/Scripts/skills.js"></script>
     <script src="assets/Scripts/questTracking.js"></script>

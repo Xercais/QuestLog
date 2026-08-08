@@ -51,8 +51,8 @@ function get_all_quest_data(){
 }
 
 function record_quest_data(skillName){
-    let quest_entry = {};
-    quest_entry.name = skillName;
-    quest_entry.checkboxStates = quests[skillName].checkboxStates;
-    return quest_entry;
+    return {
+        name: skillName,
+        checkboxStates: quests[skillName].checkboxStates
+    };
 }

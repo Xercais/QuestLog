@@ -26,19 +26,16 @@ function render_skill(skillInfo){
     let skillCard = document.createElement('div');
     skillCard.classList.add('skill-card');
     let skillName = document.createElement('h2');
-    let skillDetails = document.createElement('ul');
-    let skillXP = document.createElement('li');
-    let skillLevel = document.createElement('li');
+    let skillXP = document.createElement('p');
+    let skillLevel = document.createElement('p');
 
     skillName.textContent = title_case_skill_name(skillInfo.name);
     skillXP.textContent = "XP: " + skillInfo.xp;
     skillLevel.textContent = "Level: " + skillInfo.level;
 
-    skillDetails.append(skillXP);
-    skillDetails.append(skillLevel);
-
     skillCard.append(skillName);
-    skillCard.append(skillDetails);
+    skillCard.append(skillXP);
+    skillCard.append(skillLevel);
     
     return skillCard;
 }
@@ -93,7 +90,11 @@ function render_quest_board(questCollection){
 }
 
 function failure_popup(reason){
-    let failure_popup = document.getElementById('failed-to-add-skill')
-    failure_popup.textContent = `Failed: ${reason}`
-    failure_popup.style.display = 'block';
+    let failure_popup = document.getElementById('failed-to-add-skill');
+    let fail_reason = document.getElementById('fail-reason');
+
+    failure_popup.classList.remove('hidden');
+    fail_reason.classList.remove('hidden');
+
+    fail_reason.textContent = reason;
 }
