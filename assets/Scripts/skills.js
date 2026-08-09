@@ -28,7 +28,7 @@ function increase_skill_xp(skillName, xp_to_add){
 }
 
 function iterate_through_skills(){
-    let keys = Object.keys(skills)
+    let keys = Object.keys(skills).sort()
     return keys
 }
 
@@ -49,6 +49,23 @@ function create_skill_data(skillName){
 }
 
 function add_skill(skillName){
+    construct_new_skill(result.normalizedName)
+    
+}
+
+function rename_skill(oldName, newName){
+    skills[newName] = skills[oldName];
+    quests[newName] = quests[oldName];
+
+    remove_skill_data(oldName);
+    save_skills();
+    render_manage_skills_modal(get_all_skill_info(skills));
+    render_all_skills(get_all_skill_info(skills));
+    render_quest_board(get_all_quest_data(quests));
+    
+}
+
+function validate_skill_name(skillName){
     let normalizedName = skillName.toLowerCase();
     let return_data = {};
 
@@ -64,117 +81,42 @@ function add_skill(skillName){
 
         return return_data;
     } else {
-        construct_new_skill(normalizedName)
-
         return_data.success = true;
+        return_data.normalizedName = normalizedName;
         return return_data;
     }
+    
 }
 
 function construct_new_skill(skillName){
     skills[skillName] = {xp: 0}
 }
 
-function add_skills_logic(){
-    const content = document.getElementById('add-skill-popup');
-    let fail_popup = document.getElementById('failed-to-add-skill');
-    let fail_reason = document.getElementById('fail-reason');
-    const overlay = document.getElementById('popup-overlay');
-    const add = document.getElementById('confirm-add-skill');
-    const cancel = document.getElementById('cancel-add-skill');
-    let input = document.getElementById('skill-input');
-
-    content.classList.remove('hidden');
-    overlay.classList.remove('hidden');
-    
-    cancel.addEventListener('click', () => {
-        content.classList.add('hidden');
-        overlay.classList.add('hidden');
-
-        fail_popup.classList.add('hidden');
-        fail_reason.classList.add('hidden');
-    })
-
-    add.addEventListener('click', () => {
-        let result = add_skill(input.value)
-        if (result.success){
-            create_new_quest_data(input.value)
-            render_all_skills(get_all_skill_info(skills))
-            render_quest_board(get_all_quest_data(quests))
-            save_skills();
-            content.classList.add('hidden');
-            overlay.classList.add('hidden');
-        } else {
-            failure_popup(result.reason)
-        }
-    })
-}
-
-function manage_skills_logic(questData){
+function manage_skills_coordinator(skillInfo){
     const button = document.getElementById('manage-skills');
-    const overlay = document.getElementById('manage-skills-overlay')
-    const popup = document.getElementById('manage-skills-popup')
 
     button.addEventListener('click', () => {
-        popup.replaceChildren()
-        for (let i = 0; i < questData.length; i++){
-            popup.append(render_manage_skill_row(questData[i]))
+        render_manage_skills_modal(skillInfo)
+    })
+}
+
+function remove_skill_data(skillName){
+    delete skills[skillName];
+    delete quests[skillName];
+}
+
+function delete_skill(skillName){
+    if (skills[skillName]){
+        remove_skill_data(skillName)
+        save_skills();
+
+        render_all_skills(get_all_skill_info(skills));
+        render_quest_board(get_all_quest_data(quests));
+        render_manage_skills_modal(get_all_skill_info(skills))
+        return {success: true,}
+    } else {
+        return{success: false, 
+            reason: "Not a Valid Skill Entry. Please wait/refresh and try again."
         }
-        popup.append(render_manage_modal_buttons())
-        popup.classList.remove('hidden')
-        overlay.classList.remove('hidden')
-    })
+    }
 }
-
-function render_manage_skill_row(questData){
-    let skill_row = document.createElement('div');
-    let skill = document.createElement('p');
-    let skill_actions = document.createElement('div')
-    let rename_skill = document.createElement('button');
-    let delete_skill = document.createElement('button');
-    let linebreak = document.createElement('br');
-
-    skill_row.classList.add('manage-skill-skill-row');
-    skill_actions.classList.add('skill-actions')
-
-    skill.textContent = title_case_skill_name(questData.name);
-    rename_skill.textContent = "Rename";
-    delete_skill.textContent = "Delete";
-
-    skill_actions.append(rename_skill)
-    skill_actions.append(delete_skill)
-
-    skill_row.append(skill);
-    skill_row.append(skill_actions);
-    
-    return skill_row;
-}
-
-function render_manage_modal_buttons(){
-    let button_row = document.createElement('div');
-    let linebreak = document.createElement('br');
-    let skills_modal_button = document.createElement('button')
-    let close_manage_modal_button = document.createElement('button')
-    let overlay = document.getElementById('manage-skills-overlay')
-    let popup = document.getElementById('manage-skills-popup')
-
-    button_row.classList.add('modal-buttons')
-
-    skills_modal_button.textContent = "+ Add Skill";
-    close_manage_modal_button.textContent = "Close";
-
-    skills_modal_button.addEventListener('click', ()=>{
-        add_skills_logic();
-    })
-
-    close_manage_modal_button.addEventListener('click', ()=>{
-        overlay.classList.add('hidden');
-        popup.classList.add('hidden');
-    })
-
-    button_row.append(skills_modal_button);
-    button_row.append(close_manage_modal_button);
-    
-    return button_row;
-}
-

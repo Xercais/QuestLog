@@ -34,10 +34,9 @@ update_bestStreak_display();
 //Startup
 //===========================
 load_skills();
-render_all_skills(get_all_skill_info(skills));
-ensure_quest_data_exists(skills);
-render_quest_board(get_all_quest_data(quests));
+render_all_skills(get_all_skill_info());
+render_quest_board(get_all_quest_data());
 initialize_quest_listeners();
-manage_skills_logic(get_all_quest_data(quests))
+manage_skills_coordinator(get_all_skill_info())
 load_checkbox_states();
 

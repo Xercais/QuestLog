@@ -25,13 +25,11 @@ function initialize_quest_listeners(){
     });
 }
 
-function ensure_quest_data_exists(){
-    for (skillName of iterate_through_skills()){
-        if (quests?.[skillName]?.checkboxStates){
-            continue;
-        } else {
-            create_new_quest_data(skillName);
-        }
+function ensure_quest_data_exists(skillName){
+    if (quests?.[skillName]?.checkboxStates){
+        return;
+    } else {
+        create_new_quest_data(skillName);
     }
 }
 
@@ -44,6 +42,7 @@ function create_new_quest_data(skillName){
 function get_all_quest_data(){
     let quest_data = [];
     for (skillName of iterate_through_skills()){
+        ensure_quest_data_exists(skillName);
         quest_data.push(record_quest_data(skillName))
     }
 
