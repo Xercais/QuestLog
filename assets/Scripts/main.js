@@ -5,7 +5,6 @@ let levelDisplay = document.querySelector('#level-display');
 let xpDisplay = document.querySelector('#xp-display');
 let streakDisplay = document.querySelector('#streak-display');
 let bestStreakDisplay = document.querySelector('#best-streak')
-let checkbox_states = localStorage.getItem('checkbox_state');
 
 //===========================
 //Level
@@ -34,9 +33,10 @@ update_bestStreak_display();
 //Startup
 //===========================
 load_skills();
+load_quests();
 render_all_skills(get_all_skill_info());
 render_quest_board(get_all_quest_data());
 initialize_quest_listeners();
 manage_skills_coordinator(get_all_skill_info())
-load_checkbox_states();
+
 

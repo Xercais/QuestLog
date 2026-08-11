@@ -49,7 +49,7 @@ function create_skill_data(skillName){
 }
 
 function add_skill(skillName){
-    construct_new_skill(result.normalizedName)
+    construct_new_skill(skillName)
     
 }
 
@@ -112,6 +112,7 @@ function delete_skill(skillName){
 
         render_all_skills(get_all_skill_info(skills));
         render_quest_board(get_all_quest_data(quests));
+        initialize_quest_listeners();
         render_manage_skills_modal(get_all_skill_info(skills))
         return {success: true,}
     } else {

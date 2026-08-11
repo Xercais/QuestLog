@@ -23,30 +23,16 @@ function save_skills(){
 }
 
 //saves current state of checkboxes. function is called everytime a box is checked
-function save_checkbox_states(){
-    let checkbox_saves = [];
-    let checkboxes = document.querySelectorAll('.quest-boxes input')
-    checkboxes.forEach(checkbox =>{
-        checkbox_saves.push(checkbox.checked)
-    })
-    let checkbox_states = JSON.stringify(checkbox_saves);
-    localStorage.setItem('checkbox_state', checkbox_states)
+function save_quests(){
+    localStorage.setItem('quests', JSON.stringify(quests))
 }
 
 //retrieves the saved state of checkboxes if the save state exists and restores it
-function load_checkbox_states(){
-    let saved_states = JSON.parse(localStorage.getItem('checkbox_state'))
-    let checkboxes = document.querySelectorAll('.quest-boxes input')
-    if (saved_states === null){
-            return
-    } 
-
-    for (let i = 0; i < saved_states.length; i++){
-        if (saved_states[i]){
-            checkboxes[i].checked = true;
-            checkboxes[i].disabled = true;
-        }
-    }
+function load_quests(){
+    let saved_quests = localStorage.getItem('quests')
+    if (saved_quests !== null){
+        quests = JSON.parse(saved_quests)
+    }    
 } 
 
 function save_current_streak(streak){
