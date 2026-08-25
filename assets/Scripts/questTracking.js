@@ -19,7 +19,7 @@ function initialize_quest_listeners(){
                 let skillName = ((this.closest('section').querySelector('h2')).textContent.toLowerCase());
                 let quest_boxes = Array.from(this.closest('section').querySelectorAll('.quest-boxes input'));
                 let index = quest_boxes.indexOf(this);
-                quests[skillName].checkboxStates[index] = true;
+                quests[skillName].tasks[index].completed = true;
                 save_quests();
                 increase_skill_xp(skillName, 20);
                 render_all_skills(get_all_skill_info());
@@ -28,20 +28,21 @@ function initialize_quest_listeners(){
     });
 }
 
-function ensure_quest_data_exists(skillName){
-    if (quests?.[skillName]?.checkboxStates){
+function ensure_quest_data_exists(skillName, task_count){
+    if (quests?.[skillName]?.tasks){
         return;
     } else {
-        create_new_quest_data(skillName);
+        create_new_quest_data(skillName, task_count);
     }
 }
 
-function create_new_quest_data(skillName){
-    let result = validate_skill_name(skillName)
-    let checkbox_states = [false, false, false, false, false, false];
+function create_new_quest_data(skillName, taskCount, taskMode){
+    let tasks = []
+    for (let i = 0; i < task_count; i++){
+        tasks.push({completed: false})
+    }
     
-    let quest_entry = {[skillName] : {checkboxStates: checkbox_states}};
-    Object.assign(quests, quest_entry);
+    quests[skillName] = {mode: taskMode, tasks}
 }
 
 function get_all_quest_data(){
@@ -57,6 +58,6 @@ function get_all_quest_data(){
 function record_quest_data(skillName){
     return {
         name: skillName,
-        checkboxStates: quests[skillName].checkboxStates
+        tasks: quests[skillName].tasks
     };
 }

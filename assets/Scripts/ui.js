@@ -76,8 +76,8 @@ function render_quest_section(questdata){
 
     let questboxesSection = document.createElement('ul');
     questboxesSection.classList.add('quest-boxes');
-    for(let i = 0; i < questdata.checkboxStates.length; i++){
-        questboxesSection.append(render_quest_checkbox(questdata.checkboxStates[i]))
+    for(let i = 0; i < questdata.tasks.length; i++){
+        questboxesSection.append(render_quest_checkbox(questdata.tasks[i].completed))
     };
 
     questSection.append(questTitle);
@@ -113,7 +113,9 @@ function add_skills_logic(){
     let fail_reason = document.getElementById('fail-reason');
     const add = document.getElementById('confirm-add-skill');
     const cancel = document.getElementById('cancel-add-skill');
-    let input = document.getElementById('skill-input');
+    let skill_input = document.getElementById('skill-input');
+    let tasks_input = document.getElementById('tasks-count-input')
+    let task_mode = document.getElementById('task-mode-select')
 
     content.classList.remove('hidden');
     
@@ -124,22 +126,25 @@ function add_skills_logic(){
         fail_reason.classList.add('hidden');
     })
 
-    add.addEventListener('click', () => {
-        let result = validate_skill_name(input.value)
-        if (result.success){
+    add.onclick = () => {
+        let result = validate_skill_name(skill_input.value)
+        if (!result.success){
+            failure_popup(result.reason)
+        } else if (task_mode.value === "") {
+            failure_popup("Please select a task mode.")
+        } else {
             add_skill(result.normalizedName)
-            create_new_quest_data(result.normalizedName)
+            create_new_quest_data(result.normalizedName, Number(tasks_input.value), task_mode.value)
             render_all_skills(get_all_skill_info())
             render_quest_board(get_all_quest_data())
             initialize_quest_listeners()
             render_manage_skills_modal(get_all_skill_info())
             save_skills();
             save_quests();
+            skill_input.value = ""
             content.classList.add('hidden');
-        } else {
-            failure_popup(result.reason)
         }
-    })
+    }
 }
 
 // ============================

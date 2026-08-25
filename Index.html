@@ -48,11 +48,27 @@
             <label for="skill-input">
                 Skill Name
             </label>
-            <br><br>
+            <input type="text" id="skill-input">
         </div>
-
-        <input type="text" id="skill-input">
-        <br><br>
+        <br>
+        <div class="popup-label">
+            <label for="tasks-count-input">
+                Task Count
+            </label>
+            <input type="number" id="tasks-count-input"
+            value="6"
+            min="1">
+        </div>
+        <div class="popup-label">
+            <label for="skill-input">
+                Task Mode
+            </label>
+            <select name="task-mode" id="task-mode-select">
+                <option value="">-- Please select an option --</option>
+                <option value="repeated">Repeated Mode</option>
+                <option value="custom">Custom Mode</option>
+            </select>
+        </div>
         <div class="popup-buttons">
             <button id="confirm-add-skill">
                 Add
@@ -69,11 +85,8 @@
             <label for="rename-input">
                 Skill Name
             </label>
-            <br><br>
         </div>
-
         <input type="text" id="rename-input">
-        <br><br>
         <div class="popup-buttons">
             <button id="confirm-rename-skill">
                 Confirm

@@ -2,20 +2,7 @@
 //Data
 //===========================
 
-let skills = {
-    art: {
-        xp: 0
-    },
-    guitar: {
-        xp: 0
-    },
-    coding: {
-        xp: 0
-    },
-    workout: {
-        xp: 0
-    }
-}
+let skills = {}
 
 //===========================
 //Calculations
@@ -109,6 +96,7 @@ function delete_skill(skillName){
     if (skills[skillName]){
         remove_skill_data(skillName)
         save_skills();
+        save_quests();
 
         render_all_skills(get_all_skill_info(skills));
         render_quest_board(get_all_quest_data(quests));
