@@ -37,12 +37,23 @@ function ensure_quest_data_exists(skillName, task_count){
 }
 
 function create_new_quest_data(skillName, taskCount, taskMode){
-    let tasks = []
-    for (let i = 0; i < task_count; i++){
-        tasks.push({completed: false})
+    let tasks = [];
+
+    switch (taskMode){
+        case "repeated":
+            for (let i = 0; i < taskCount; i++){
+                tasks.push({completed: false});
+            }
+            break;
+
+        case "custom":
+            for (let i = 0; i < taskCount; i++){
+                tasks.push({name: "", completed: false});
+            }
+            break;
     }
-    
-    quests[skillName] = {mode: taskMode, tasks}
+
+    quests[skillName] = {mode: taskMode, tasks};
 }
 
 function get_all_quest_data(){

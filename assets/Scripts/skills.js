@@ -79,12 +79,12 @@ function construct_new_skill(skillName){
     skills[skillName] = {xp: 0}
 }
 
-function manage_skills_coordinator(skillInfo){
-    const button = document.getElementById('manage-skills');
+function manage_skills_coordinator(){
+    let button = document.getElementById('manage-skills');
 
-    button.addEventListener('click', () => {
-        render_manage_skills_modal(skillInfo)
-    })
+    button.onclick = () => {
+    render_manage_skills_modal(get_all_skill_info())
+    }
 }
 
 function remove_skill_data(skillName){

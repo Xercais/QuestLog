@@ -53,7 +53,7 @@ function render_all_skills(skillCollection){
 // ============================
 //Quest Board Rendering
 // ============================
-function render_quest_checkbox(isChecked){
+function render_quest_checkbox(isChecked, task){
     let questContainer = document.createElement('li');
     let questBox = document.createElement('input');
 
@@ -62,6 +62,17 @@ function render_quest_checkbox(isChecked){
     if (isChecked){
         questBox.disabled = true;
     }
+
+    if (Object.hasOwn(task, "name")){
+        let taskLabel = document.createElement('span');
+        if (!task.name){
+            taskLabel.textContent = "Unnamed Task";
+        } else {
+            taskLabel.textContent = task.name;
+        }
+        questContainer.append(taskLabel);
+    }
+
     questContainer.append(questBox);
 
     return questContainer;
@@ -77,7 +88,7 @@ function render_quest_section(questdata){
     let questboxesSection = document.createElement('ul');
     questboxesSection.classList.add('quest-boxes');
     for(let i = 0; i < questdata.tasks.length; i++){
-        questboxesSection.append(render_quest_checkbox(questdata.tasks[i].completed))
+        questboxesSection.append(render_quest_checkbox(questdata.tasks[i].completed, questdata.tasks[i]))
     };
 
     questSection.append(questTitle);
@@ -170,7 +181,7 @@ function render_manage_skill_row(skillInfo){
     let skill_actions = document.createElement('div')
     let rename_button = document.createElement('button');
     let delete_button = document.createElement('button');
-    let linebreak = document.createElement('br');
+    let task_manage_button = document.createElement('button');
 
     skill_row.classList.add('manage-skill-skill-row');
     skill_actions.classList.add('skill-actions')
@@ -178,6 +189,8 @@ function render_manage_skill_row(skillInfo){
     skill.textContent = title_case_skill_name(skillInfo.name);
     rename_button.textContent = "Rename";
     delete_button.textContent = "Delete";
+    task_manage_button.textContent = "Tasks";
+    
 
     rename_button.addEventListener('click', () =>{
         render_rename_modal(skillInfo.name)
@@ -188,13 +201,31 @@ function render_manage_skill_row(skillInfo){
         render_confirm_delete_popup(skillInfo.name)
     })
 
+    task_manage_button.addEventListener('click', ()=> {
+        let questData = quests[skillInfo.name]
+        if (questData.mode !== "repeated"){
+        choose_nameable_tasks_modal(questData);
+    } else {
+        render_repeated_tasks_modal();
+    }
+    })
+
     skill_actions.append(rename_button)
     skill_actions.append(delete_button)
+    skill_actions.append(task_manage_button)
 
     skill_row.append(skill);
     skill_row.append(skill_actions);
     
     return skill_row;
+}
+
+function choose_nameable_tasks_modal(taskMode){
+    console.log(taskMode.mode)
+}
+
+function render_repeated_tasks_modal(){
+    console.log("repeated")
 }
 
 function render_confirm_delete_popup(skillName){
@@ -261,7 +292,6 @@ function render_rename_modal(oldName){
 
 function render_manage_modal_buttons(){
     let button_row = document.createElement('div');
-    let linebreak = document.createElement('br');
     let add_skills = document.createElement('button')
     let close_manage_modal = document.createElement('button')
     let overlay = document.getElementById('manage-skills-overlay')
