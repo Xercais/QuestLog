@@ -42,15 +42,20 @@ function create_new_quest_data(skillName, taskCount, taskMode){
     switch (taskMode){
         case "repeated":
             for (let i = 0; i < taskCount; i++){
-                tasks.push({completed: false});
+                tasks.push({ number: (i + 1), duration: 0, completed: false});
             }
             break;
 
         case "custom":
             for (let i = 0; i < taskCount; i++){
-                tasks.push({name: "", completed: false});
+                tasks.push({skillName: skillName, name: "", completed: false});
             }
             break;
+
+        case "timed":
+            for (let i = 0; i < taskCount; i++){
+                tasks.push({skillName: skillName, name: "", duration: 0, completed: false})
+            }
     }
 
     quests[skillName] = {mode: taskMode, tasks};

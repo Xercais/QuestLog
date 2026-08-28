@@ -56,6 +56,7 @@ function render_all_skills(skillCollection){
 function render_quest_checkbox(isChecked, task){
     let questContainer = document.createElement('li');
     let questBox = document.createElement('input');
+    let taskLabel = document.createElement('span');
 
     questBox.type = 'checkbox';
     questBox.checked = isChecked;
@@ -64,16 +65,22 @@ function render_quest_checkbox(isChecked, task){
     }
 
     if (Object.hasOwn(task, "name")){
-        let taskLabel = document.createElement('span');
+        
         if (!task.name){
             taskLabel.textContent = "Unnamed Task";
         } else {
             taskLabel.textContent = task.name;
         }
-        questContainer.append(taskLabel);
+    } else {
+        taskLabel.textContent = `Task ${task.number}`
+    }
+
+    if (Object.hasOwn(task, "duration")){
+            taskLabel.textContent += ` (${task.duration} min)`;
     }
 
     questContainer.append(questBox);
+    questContainer.append(taskLabel);
 
     return questContainer;
 }
@@ -206,7 +213,7 @@ function render_manage_skill_row(skillInfo){
         if (questData.mode !== "repeated"){
         choose_nameable_tasks_modal(questData);
     } else {
-        render_repeated_tasks_modal();
+        render_repeated_tasks_modal(questData);
     }
     })
 
@@ -220,13 +227,253 @@ function render_manage_skill_row(skillInfo){
     return skill_row;
 }
 
-function choose_nameable_tasks_modal(taskMode){
-    console.log(taskMode.mode)
+function choose_nameable_tasks_modal(questData){
+    const popup = document.getElementById('tasks-modal');
+    popup.classList.remove('hidden');
+    popup.replaceChildren();
+
+    switch (questData.mode){
+        case "custom":
+            render_custom_tasks_modal(questData)
+            break;
+    }
 }
 
-function render_repeated_tasks_modal(){
-    console.log("repeated")
+function render_custom_tasks_modal(questData){
+    const popup = document.getElementById('tasks-modal');
+    popup.replaceChildren();
+
+    let buttons_section = document.createElement('div');
+    buttons_section.classList.add('popup-buttons');
+    
+    let exit_button = document.createElement('button');
+    exit_button.textContent = "Exit"
+    exit_button.addEventListener('click', () => {
+        popup.classList.add('hidden');
+    })
+
+    let add_button = document.createElement('button');
+    add_button.textContent = "+ Add Task";
+    add_button.addEventListener('click', () => {
+        let create_task_modal = document.getElementById('create-task-modal');
+        create_task_modal.replaceChildren();
+        create_task_modal.classList.remove('hidden');
+        let modal_header = document.createElement('h2');
+        let task_name = document.createElement('input');
+        let confirm_button = document.createElement('button');
+        let cancel_button = document.createElement('button');
+        let button_section = document.createElement('div');
+
+        button_section.classList.add('popup-buttons')
+
+        modal_header.textContent = "New Task";
+        confirm_button.textContent = "Confirm";
+        cancel_button.textContent = "Cancel";
+
+        task_name.value = "Enter Task Name";
+
+        confirm_button.addEventListener('click', () => {
+            quest_to_add_task_to = questData.tasks;
+            quest_to_add_task_to.push({skillName: questData.tasks[0].skillName, name: task_name.value, completed: false});
+            render_custom_tasks_modal(questData);
+            save_quests();
+            render_quest_board(get_all_quest_data());
+            create_task_modal.classList.add('hidden');
+        })
+
+        cancel_button.addEventListener('click', () => {
+            create_task_modal.classList.add('hidden');
+        })
+
+        button_section.append(confirm_button);
+        button_section.append(cancel_button);
+
+        create_task_modal.append(modal_header);
+        create_task_modal.append(task_name);
+        create_task_modal.append(button_section);
+    })
+    
+    for (let i = 0; i < questData.tasks.length; i++){
+        let task_container = document.createElement('div');
+        let taskName = document.createElement('p');
+        let rename_button = document.createElement('button');
+        let remove_button = document.createElement('button');
+        
+        task_container.classList.add('manage-skill-skill-row')
+
+        if (!questData.tasks[i].name){
+            taskName.textContent = "Unnamed Task";
+        } else {
+            taskName.textContent = questData.tasks[i].name;
+        }
+
+        rename_button.textContent = "Rename\nTask"
+        rename_button.addEventListener('click', () => {
+            render_rename_task_modal(questData.tasks[i]);
+        })
+
+        
+        remove_button.textContent = "Remove\nTask";       
+        remove_button.addEventListener('click', () => {
+            remove_button.parentElement.remove();
+            questData.tasks.splice(i, 1);
+            save_quests();
+            render_quest_board(get_all_quest_data());
+        })
+
+        task_container.append(taskName);
+        task_container.append(rename_button);
+        task_container.append(remove_button);
+
+        popup.append(task_container);
+    }
+    buttons_section.append(add_button);
+    buttons_section.append(exit_button);
+
+    popup.append(buttons_section);
 }
+
+function render_rename_task_modal(questData){
+    const popup = document.getElementById('rename-task-modal');
+    popup.replaceChildren();
+    popup.classList.remove('hidden');
+
+    let input = document.createElement('input');
+    let heading = document.createElement('h2');
+
+    input.type = 'text';
+    input.id = 'rename-task-input';
+    heading.textContent = "Rename Skill";
+
+    let confirm_button = document.createElement('button');
+    let cancel_button = document.createElement('button');
+    let buttons_section = document.createElement('div')
+
+    buttons_section.classList.add('modal-buttons')
+
+    confirm_button.textContent = "Confirm";
+    cancel_button.textContent = "Cancel";
+
+    confirm_button.addEventListener('click', () => {
+        popup.classList.add('hidden');
+        questData.name = title_case(input.value);
+        save_quests();
+        render_quest_board(get_all_quest_data());
+        choose_nameable_tasks_modal(quests[questData.skillName])
+    })
+
+    cancel_button.addEventListener('click', () => {
+        popup.classList.add('hidden');
+    })
+
+    buttons_section.append(confirm_button);
+    buttons_section.append(cancel_button);
+
+    popup.append(heading);
+    popup.append(input);
+    popup.append(buttons_section);
+}
+
+function title_case(text){
+    return text.toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+}
+
+function render_repeated_tasks_modal(questData){
+    const popup = document.getElementById('tasks-modal');
+    popup.classList.remove('hidden');
+    popup.replaceChildren();
+    
+    let exit_button = document.createElement('button');
+    exit_button.textContent = "Exit";
+    exit_button.addEventListener('click', () => {
+        popup.classList.add('hidden');
+    })
+
+    let add_task_button = document.createElement('button');
+    add_task_button.textContent = "+ Add Task";
+    add_task_button.addEventListener('click', () => {
+        create_new_quest_data(questData.tasks[0].skillName, (questData.tasks.length + 1), questData.mode);
+        render_repeated_tasks_modal(quests[questData.tasks[0].skillName])
+        save_quests();
+        render_quest_board(get_all_quest_data());
+    })
+
+    let buttons_section = document.createElement('div');
+    buttons_section.classList.add('popup-buttons');
+
+    for (let i = 0; i < questData.tasks.length; i++){
+        let task_container = document.createElement('div');
+        let task_name = document.createElement('p')
+        let remove_button = document.createElement('button')
+        let edit_button = document.createElement('button');
+    
+        task_name.textContent = `Task ${(i + 1)}`;
+        remove_button.textContent = 'Remove';
+        edit_button.textContent = "Edit Task";
+
+        task_container.classList.add('manage-skill-skill-row');
+
+        remove_button.addEventListener('click', () => {
+            remove_button.parentElement.remove();
+            questData.tasks.splice(i, 1);
+            save_quests();
+            render_quest_board(get_all_quest_data());
+        })
+
+        edit_button.onclick = () => {
+            let edit_popup = document.getElementById('edit-task-modal');
+            edit_popup.classList.remove('hidden');
+            edit_popup.replaceChildren();
+
+            let task_label = document.createElement('h2');
+            let task_duration = document.createElement('p');
+            let new_duration = document.createElement('input');
+            let edit_buttons_section = document.createElement('div');
+            let confirm_button = document.createElement('button');
+            let cancel_button = document.createElement('button');
+
+            task_label.textContent = `Task ${(i + 1)}`;
+            task_duration.textContent = `${questData.tasks[i].duration} min`;
+            new_duration.type = 'number'
+            confirm_button.textContent = "Confirm";
+            cancel_button.textContent = "Cancel";
+
+            edit_buttons_section.classList.add('popup-buttons');
+
+            confirm_button.addEventListener('click', () => {
+                questData.tasks[i].duration = new_duration.value;
+                save_quests();
+                render_quest_board(get_all_quest_data());
+                render_repeated_tasks_modal(quests[questData.tasks[i].skillName])
+                edit_popup.classList.add('hidden');
+            })
+
+            cancel_button.addEventListener('click', () => {
+                edit_popup.classList.add('hidden');
+            })
+
+            edit_buttons_section.append(confirm_button);
+            edit_buttons_section.append(cancel_button);
+
+            edit_popup.append(task_label);
+            edit_popup.append(task_duration);
+            edit_popup.append(new_duration);
+            edit_popup.append(edit_buttons_section);
+        }
+
+        task_container.append(task_name);
+        task_container.append(remove_button);
+        task_container.append(edit_button);
+
+        popup.append(task_container)
+    }
+
+    buttons_section.append(add_task_button);
+    buttons_section.append(exit_button);
+    popup.append(buttons_section);
+}
+
+
 
 function render_confirm_delete_popup(skillName){
     const popup = document.getElementById('confirm-delete');
