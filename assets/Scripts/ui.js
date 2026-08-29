@@ -136,6 +136,8 @@ function add_skills_logic(){
     let task_mode = document.getElementById('task-mode-select')
 
     content.classList.remove('hidden');
+
+    task_mode.selectedIndex = 0;
     
     cancel.addEventListener('click', () => {
         content.classList.add('hidden');
@@ -233,15 +235,18 @@ function choose_nameable_tasks_modal(questData){
     popup.replaceChildren();
 
     switch (questData.mode){
-        case "custom":
-            render_custom_tasks_modal(questData)
+        case "milestone":
+            render_milestone_tasks_modal(questData)
+            break;
+
+        case "timed":
+            render_timed_tasks_modal(questData);
             break;
     }
 }
 
-function render_custom_tasks_modal(questData){
+function render_milestone_tasks_modal(questData){
     const popup = document.getElementById('tasks-modal');
-    popup.replaceChildren();
 
     let buttons_section = document.createElement('div');
     buttons_section.classList.add('popup-buttons');
@@ -274,8 +279,8 @@ function render_custom_tasks_modal(questData){
 
         confirm_button.addEventListener('click', () => {
             quest_to_add_task_to = questData.tasks;
-            quest_to_add_task_to.push({skillName: questData.tasks[0].skillName, name: task_name.value, completed: false});
-            render_custom_tasks_modal(questData);
+            quest_to_add_task_to.push({skillName: questData.tasks[0].skillName, name: title_case(task_name.value), completed: false});
+            render_milestone_tasks_modal(questData);
             save_quests();
             render_quest_board(get_all_quest_data());
             create_task_modal.classList.add('hidden');
@@ -376,6 +381,150 @@ function render_rename_task_modal(questData){
 
 function title_case(text){
     return text.toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+}
+
+function render_timed_tasks_modal(questData){
+    const popup = document.getElementById('tasks-modal');
+    
+    let add_button = document.createElement('button');
+    let exit_button = document.createElement('button');
+
+    add_button.textContent = "+ Add Task";
+    add_button.addEventListener('click', () => {
+        let create_task_modal = document.getElementById('create-task-modal');
+        create_task_modal.replaceChildren();
+        create_task_modal.classList.remove('hidden');
+        create_task_modal.classList.add('popup-label');
+        let modal_header = document.createElement('h2');
+        let task_name = document.createElement('input');
+        let task_duration = document.createElement('input');
+        let confirm_button = document.createElement('button');
+        let cancel_button = document.createElement('button');
+        let button_section = document.createElement('div');
+
+        button_section.classList.add('popup-buttons')
+
+        modal_header.textContent = "New Task";
+        confirm_button.textContent = "Confirm";
+        cancel_button.textContent = "Cancel";
+
+        task_name.value = "Enter Task Name";
+        task_duration.type = 'number';
+
+        task_name.addEventListener('focus', (event) => {
+            event.target.select();
+        })
+
+        confirm_button.addEventListener('click', () => {
+            quest_to_add_task_to = questData.tasks;
+            quest_to_add_task_to.push({skillName: questData.tasks[0].skillName, name: title_case(task_name.value), duration:task_duration.value, completed: false});
+            choose_nameable_tasks_modal(questData);
+            save_quests();
+            render_quest_board(get_all_quest_data());
+            create_task_modal.classList.add('hidden');
+        })
+
+        cancel_button.addEventListener('click', () => {
+            create_task_modal.classList.add('hidden');
+        })
+
+        button_section.append(confirm_button);
+        button_section.append(cancel_button);
+
+        create_task_modal.append(modal_header);
+        create_task_modal.append(task_name);
+        create_task_modal.append(task_duration);
+        create_task_modal.append(button_section);
+
+    })
+
+    exit_button.textContent = "Exit";
+    exit_button.addEventListener('click', () => {
+        popup.classList.add('hidden');
+    })
+
+    let buttons_section = document.createElement('div');
+    buttons_section.classList.add('popup-buttons');
+
+    for (let i = 0; i <questData.tasks.length; i++){
+        let task_container = document.createElement('div');
+        let task_name = document.createElement('p')
+        let remove_button = document.createElement('button')
+        let edit_button = document.createElement('button');
+
+        task_container.classList.add('manage-skill-skill-row');
+
+        task_name.textContent = questData.tasks[i].name  || "Unnamed Task";
+        task_name.textContent += ` (${questData.tasks[i].duration} min)`
+        remove_button.textContent = "Remove Task";
+        edit_button.textContent = "Edit Task";
+
+        remove_button.addEventListener('click', () => {
+            remove_button.parentElement.remove();
+            questData.tasks.splice(i, 1);
+            save_quests();
+            render_quest_board(get_all_quest_data());
+        })
+
+        edit_button.onclick = () => {
+            let edit_popup = document.getElementById('edit-task-modal');
+            edit_popup.classList.add('popup-label');
+            edit_popup.classList.remove('hidden');
+            edit_popup.replaceChildren();
+
+            let task_label = document.createElement('h2');
+            let task_duration = document.createElement('p');
+            let new_name = document.createElement('input');
+            let new_duration = document.createElement('input');
+            let edit_buttons_section = document.createElement('div');
+            let confirm_button = document.createElement('button');
+            let cancel_button = document.createElement('button');
+
+            task_label.textContent = questData.tasks[i].name || "Unnamed Task";
+            task_duration.textContent = `${questData.tasks[i].duration} min`;
+            new_name.type = 'text';
+            new_name.value = questData.tasks[i].name;
+            new_duration.type = 'number'
+            confirm_button.textContent = "Confirm";
+            cancel_button.textContent = "Cancel";
+
+            edit_buttons_section.classList.add('popup-buttons');
+
+            confirm_button.addEventListener('click', () => {
+                questData.tasks[i].name = title_case(new_name.value);
+                questData.tasks[i].duration = new_duration.value;
+                save_quests();
+                render_quest_board(get_all_quest_data());
+                render_timed_tasks_modal(quests[questData.tasks[i].skillName])
+                edit_popup.classList.add('hidden');
+            })
+
+            cancel_button.addEventListener('click', () => {
+                edit_popup.classList.add('hidden');
+            })
+
+            edit_buttons_section.append(confirm_button);
+            edit_buttons_section.append(cancel_button);
+
+            edit_popup.append(task_label);
+            edit_popup.append(task_duration);
+            edit_popup.append(new_name);
+            edit_popup.append(new_duration);
+            edit_popup.append(edit_buttons_section);
+        }
+
+        task_container.append(task_name);
+        task_container.append(remove_button);
+        task_container.append(edit_button);
+
+        buttons_section.append(add_button);
+        buttons_section.append(exit_button);
+
+        popup.append(task_container);
+        popup.append(buttons_section);
+    }
+
+
 }
 
 function render_repeated_tasks_modal(questData){

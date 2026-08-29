@@ -46,7 +46,7 @@ function create_new_quest_data(skillName, taskCount, taskMode){
             }
             break;
 
-        case "custom":
+        case "milestone":
             for (let i = 0; i < taskCount; i++){
                 tasks.push({skillName: skillName, name: "", completed: false});
             }
