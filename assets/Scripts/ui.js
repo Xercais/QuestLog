@@ -388,6 +388,8 @@ function render_timed_tasks_modal(questData){
     
     let add_button = document.createElement('button');
     let exit_button = document.createElement('button');
+    let buttons_section = document.createElement('div');
+    buttons_section.classList.add('popup-buttons');
 
     add_button.textContent = "+ Add Task";
     add_button.addEventListener('click', () => {
@@ -443,9 +445,6 @@ function render_timed_tasks_modal(questData){
         popup.classList.add('hidden');
     })
 
-    let buttons_section = document.createElement('div');
-    buttons_section.classList.add('popup-buttons');
-
     for (let i = 0; i <questData.tasks.length; i++){
         let task_container = document.createElement('div');
         let task_name = document.createElement('p')
@@ -495,7 +494,7 @@ function render_timed_tasks_modal(questData){
                 questData.tasks[i].duration = new_duration.value;
                 save_quests();
                 render_quest_board(get_all_quest_data());
-                render_timed_tasks_modal(quests[questData.tasks[i].skillName])
+                choose_nameable_tasks_modal(quests[questData.tasks[i].skillName])
                 edit_popup.classList.add('hidden');
             })
 
@@ -521,10 +520,8 @@ function render_timed_tasks_modal(questData){
         buttons_section.append(exit_button);
 
         popup.append(task_container);
-        popup.append(buttons_section);
     }
-
-
+    popup.append(buttons_section);
 }
 
 function render_repeated_tasks_modal(questData){
