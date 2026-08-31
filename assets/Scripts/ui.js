@@ -53,6 +53,86 @@ function render_all_skills(skillCollection){
 // ============================
 //Quest Board Rendering
 // ============================
+function create_milestone_task_modal(){
+    let taskLabel = document.createElement('label');
+    let nameInput = document.createElement('input');
+    let inputContainer = document.createElement('div');
+
+    nameInput.type = 'text';
+    nameInput.id = 'name-input';
+    nameInput.placeholder = "Enter task name";
+    nameInput.addEventListener('focus', () => {
+        nameInput.select();
+    });
+
+    taskLabel.textContent = "Task Name";
+    taskLabel.setAttribute('for', 'name-input');
+
+    inputContainer.append(taskLabel);
+    inputContainer.append(nameInput);
+    inputContainer.classList.add('task-input-row');
+
+    let returnObject = {
+        mode: "milestone",
+        element: inputContainer,
+        getData() {
+            return {
+                mode: "milestone",
+                name: nameInput.value.trim()
+            };
+        },
+        focus() {
+            nameInput.focus();
+        },
+        getInput() {
+            return nameInput;
+        },
+        isEmpty() {
+            return nameInput.value.trim() === "";
+        },
+        clear() {
+            nameInput.value = "";
+        },
+        setName(newName) {
+            nameInput.value = newName;
+        }
+    }
+    return returnObject;
+}
+
+function task_modal_controller(mode){
+    let builder;
+
+    switch (mode){
+        case "milestone":
+            builder = create_milestone_task_modal();
+            break;
+    }
+    modal.setContent(builder.element);
+    builder.focus();
+
+    modal.onSubmit(() => {
+        if (builder.isEmpty()){
+            return;
+        } else {
+           let data = builder.getData();
+           save_task(data)
+           builder.clear();
+           modal.close();
+        }
+    })
+}
+
+function save_task(data){
+    switch(data.mode){
+        case "milestone":
+            save_milestone_task(data.name)
+    }
+}
+
+function save_milestone_task(name){
+    console.log(name);
+}
 function render_quest_checkbox(isChecked, task){
     let questContainer = document.createElement('li');
     let questBox = document.createElement('input');
