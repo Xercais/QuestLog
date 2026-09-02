@@ -22,4 +22,24 @@ function update_global_level(xp){
     update_level_display(level);
 }
 
+function apply_task_xp(task, playerState){
+    let baseGlobal = 10;
+    let baseSkill = 20;
 
+    if (5 < playerState.streak < 10) {
+        baseGlobal += 5;
+    }
+
+    if (playerState.globalLevel < 3) {
+        baseGlobal *= 1.5;
+    }
+    return {
+        globalXPtoAdd: Math.floor(baseGlobal),
+        skillXPtoAdd: Math.floor(baseSkill)
+    }
+}
+
+function apply_xp_effects(skillName, xpBundle){
+    increase_XP(xpBundle.globalXPtoAdd);
+    increase_skill_xp(skillName, xpBundle.skillXPtoAdd);
+}

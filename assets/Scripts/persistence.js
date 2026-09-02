@@ -42,3 +42,7 @@ function save_current_streak(streak){
 function save_current_bestStreak(streak){
     localStorage.setItem('best_streak', streak)
 }
+
+function save_task_completion(skillName, index){
+    quests[skillName].tasks[index].completed = true;
+}

@@ -123,11 +123,28 @@ function task_modal_controller(mode){
     })
 }
 
+function task_changed(skillName, index){
+    const task = quests[skillName].tasks[index];
+    const playerState = {
+        globalXP: xp,
+        skillXP: skills[skillName].xp,
+        streak,
+        globalLevel: calculate_level(xp, 10),
+        skillLevel: calculate_level(skills[skillName].xp, 5)};
+    const xpBundle = apply_task_xp(task, playerState);
+    
+    apply_xp_effects(skillName, xpBundle);
+    render_quest_board(get_all_quest_data());
+    render_all_skills(get_all_skill_info());
+}
+
 function save_task(data){
     switch(data.mode){
         case "milestone":
             save_milestone_task(data.name)
     }
+    // persistence save
+    task_changed(data);
 }
 
 function save_milestone_task(name){
