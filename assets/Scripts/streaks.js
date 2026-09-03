@@ -3,27 +3,18 @@
 //===========================
 
 //logic for checking if the streak increments
+//MODEL
 function check_if_streak_increments(){
-    let last_day = JSON.parse(localStorage.getItem('checkbox_state'));
-    if (last_day === null){
+    let yesterday = JSON.parse(localStorage.getItem('task_completion_snapshot'));
+    if (yesterday === null){
         return
-    } else {
-        let counter = 0;
-        for (let i = 0; i < last_day.length; i++){
-        if(last_day[i]){
-            counter++;
-            }
-        } if (counter === last_day.length){
-            streak_handling(true)
-        } else {
-            streak_handling(false)
-        }
-        
-    }
-    
+    } 
+    const completed = yesterday.filter(Boolean).length;
+    streak_handling(completed === yesterday.length);
 }
 
 //logic for handling streaks. if streak increments, also compares current streak to best streak
+//MODEL
 function streak_handling(isIncrementing){
     if (isIncrementing){
         streak += 1;
@@ -37,6 +28,7 @@ function streak_handling(isIncrementing){
 }
 
 //logic for comparing and storing best streak
+//MODEL
 function compare_to_best_streak(streak){
     let best_streak = localStorage.getItem('best_streak')
     if (best_streak === null){
@@ -49,6 +41,7 @@ function compare_to_best_streak(streak){
 }
 
 //function for loading saved streak and best streak and updating the display with those loaded values
+//MODEL
 function load_streak(){
     let current_streak = localStorage.getItem('current_streak')
     let best_streak = localStorage.getItem('best_streak')

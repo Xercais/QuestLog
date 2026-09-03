@@ -27,6 +27,7 @@ function get_all_skill_info(){
     return skill_data;
 }
 
+//MODEL
 function create_skill_data(skillName){
     return {
         name: skillName,
@@ -35,11 +36,13 @@ function create_skill_data(skillName){
     };
 }
 
+//MODEL
 function add_skill(skillName){
     construct_new_skill(skillName)
     
 }
 
+//MODEL
 function rename_skill(oldName, newName){
     skills[newName] = skills[oldName];
     quests[newName] = quests[oldName];
@@ -75,6 +78,7 @@ function validate_skill_name(skillName){
     
 }
 
+//MODEL
 function construct_new_skill(skillName){
     skills[skillName] = {xp: 0}
 }
@@ -87,11 +91,13 @@ function manage_skills_coordinator(){
     }
 }
 
+//MODEL
 function remove_skill_data(skillName){
     delete skills[skillName];
     delete quests[skillName];
 }
 
+//MODEL
 function delete_skill(skillName){
     if (skills[skillName]){
         remove_skill_data(skillName)

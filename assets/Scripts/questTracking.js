@@ -9,15 +9,17 @@ let quests = {};
 //Initialize
 //===========================
 
+//CONTROLLER
 function initialize_quest_listeners(){
     const checkboxes = document.querySelectorAll('.quest-boxes input')
     checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            if (this.checked){
-                this.disabled = true;
-                let skillName = ((this.closest('section').querySelector('h2')).textContent.toLowerCase());
-                let quest_boxes = Array.from(this.closest('section').querySelectorAll('.quest-boxes input'));
-                let index = quest_boxes.indexOf(this);
+        checkbox.addEventListener('change', event => {
+            const checkbox = event.currentTarget;
+            if (checkbox.checked){
+                checkbox.disabled = true;
+                let skillName = ((checkbox.closest('section').querySelector('h2')).textContent.toLowerCase());
+                let quest_boxes = Array.from(checkbox.closest('section').querySelectorAll('.quest-boxes input'));
+                let index = quest_boxes.indexOf(checkbox);
                 save_task_completion(skillName, index)
                 save_quests();
                 task_changed(skillName, index)
@@ -40,21 +42,21 @@ function create_new_quest_data(skillName, taskCount, taskMode){
     switch (taskMode){
         case "repeated":
             for (let i = 0; i < taskCount; i++){
-            let quest_data = create_repeated_quest_data(i, taskMode);
+            let quest_data = create_repeated_quest_data({skillName, name: "", repetitions: 1, difficulty: "normal"});
             tasks.push(quest_data)
         }
         break;
 
         case "milestone":
             for (let i = 0; i < taskCount; i++){
-            let quest_data = create_milestone_quest_data(skillName, taskMode);
+            let quest_data = create_milestone_quest_data({skillName, name: "", difficulty: "normal"});
             tasks.push(quest_data)
             }
             break;
 
         case "timed":
             for (let i = 0; i < taskCount; i++){
-                let quest_data = create_timed_quest_data(skillName, taskMode)
+                let quest_data = create_timed_quest_data({skillName, name: "", duration: 1, difficulty: "normal"})
                 tasks.push(quest_data)
             }
             break;
@@ -63,40 +65,68 @@ function create_new_quest_data(skillName, taskCount, taskMode){
     quests[skillName] = {mode: taskMode, tasks};
 }
 
-function create_repeated_quest_data(i, taskMode){
-    return {taskMode, number: (i + 1), duration: 0, completed: false, getXPInfo(){
-            return {
-                taskMode: this.taskMode,
-                duration: this.duration,
-                difficulty: "easy",
-                repetitions: 1,
-                isMilestone: false
+//MODEL
+function create_repeated_quest_data(name, repetitions, skillName, difficulty){
+    repetitions = Number(repetitions)
+    if (!Number.isFinite(repetitions) || repetitions < 1){
+        throw new Error (
+            "create_repeated_quest_data: repetitions must be >= 1"
+        )
+    }
+
+    const valid_difficulties = ["easy", "normal", "hard"];
+    if (!valid_difficulties.includes(difficulty)){
+        throw new Error(
+            `Invalid difficulty: ${difficulty}`
+        )
+    }
+
+    return {skillName, name, completed: false,
+        config:{
+            taskMode: "repeated",
+            difficulty,
+            repetitions,
         }
-    }};
+    }
 }
 
-function create_milestone_quest_data(skillName, taskMode){
-    return {taskMode, skillName, name: "", completed: false, getXPInfo(){
-            return {
-                taskMode: this.taskMode,
-                duration: 0,
-                difficulty: "easy",
-                repetitions: 0,
-                isMilestone: true
+//MODEL
+function create_milestone_quest_data(name, skillName, difficulty){
+    const valid_difficulties = ["easy", "normal", "hard"];
+    if (!valid_difficulties.includes(difficulty)){
+        throw new Error(
+            `Invalid difficulty: ${difficulty}`
+        )
+    }
+    return {skillName, name, completed: false,
+        config: {
+            taskMode: "milestone",
+            difficulty,
         }
-    }}
+    }
 }
 
-function create_timed_quest_data(skillName, taskMode){
-    return {taskMode, skillName, name: "", duration: 0, completed: false, getXPInfo(){
-            return {
-                taskMode: this.taskMode,
-                duration: this.duration,
-                difficulty: "easy",
-                repetitions: 0,
-                isMilestone: false
-        }
-    }}
+//MODEL
+function create_timed_quest_data(name, skillName, duration, difficulty){
+    duration = Number(duration)
+    if (!Number.isFinite(duration) || duration < 1){
+        throw new Error (
+            "create_repeated_quest_data: repetitions must be >= 1"
+        )
+    }
+
+    const valid_difficulties = ["easy", "normal", "hard"];
+    if (!valid_difficulties.includes(difficulty)){
+        throw new Error(
+            `Invalid difficulty: ${difficulty}`
+        )
+    }
+    return {name, skillName, completed: false, 
+        config: {
+            taskMode: "timed",
+            duration,
+            difficulty,
+        }}
 }
 
 function get_all_quest_data(){
