@@ -6,6 +6,10 @@
 //MODEL
 function increase_XP(xp_to_add){
     xp += xp_to_add;
+}
+
+function increase_XP_controller(xp_to_add){
+    increase_XP(xp_to_add);
     update_xp_display();
     save_xp();
     update_global_level(xp);
@@ -20,8 +24,7 @@ function calculate_level(current_total_xp, scalingFactor){
 //function that updates adventurer level display
 //MODEL
 function update_global_level(xp){
-    level = calculate_level(xp, 10);
-    update_level_display(level);
+    update_level_display(calculate_level(xp, 10));
 }
 
 //MODEL
@@ -45,7 +48,7 @@ function get_base_global_xp(config){
             base_xp = 10
             break;
         case "milestone":
-            base_xp = 50;
+            base_xp = 35;
             break;
         case "timed":
             base_xp = 25;
@@ -126,7 +129,7 @@ function milestone_bonus(xp, config){
 }
 
 //MODEL
-function apply_xp_effects(skillName, xpBundle){
-    increase_XP(xpBundle.globalXPtoAdd);
+function apply_xp_controller(skillName, xpBundle){
+    increase_XP_controller(xpBundle.globalXPtoAdd);
     increase_skill_xp(skillName, xpBundle.skillXPtoAdd);
 }

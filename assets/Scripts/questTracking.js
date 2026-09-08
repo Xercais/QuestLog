@@ -22,7 +22,7 @@ function initialize_quest_listeners(){
                 let index = quest_boxes.indexOf(checkbox);
                 save_task_completion(skillName, index)
                 save_quests();
-                task_changed(skillName, index)
+                task_changed_app_controller(skillName, index)
             }
         });
     });
@@ -42,7 +42,7 @@ function create_new_quest_data(skillName, taskCount, taskMode){
     switch (taskMode){
         case "repeated":
             for (let i = 0; i < taskCount; i++){
-            let quest_data = create_repeated_quest_data({skillName, name: "", repetitions: 1, difficulty: "normal"});
+            let quest_data = create_repeated_quest_data({duration: 1, skillName, number: i + 1, difficulty: "normal"});
             tasks.push(quest_data)
         }
         break;
@@ -66,9 +66,9 @@ function create_new_quest_data(skillName, taskCount, taskMode){
 }
 
 //MODEL
-function create_repeated_quest_data(name, repetitions, skillName, difficulty){
-    repetitions = Number(repetitions)
-    if (!Number.isFinite(repetitions) || repetitions < 1){
+function create_repeated_quest_data({duration, skillName, number, difficulty}){
+    duration = Number(duration)
+    if (!Number.isFinite(duration) || duration < 1){
         throw new Error (
             "create_repeated_quest_data: repetitions must be >= 1"
         )
@@ -81,17 +81,18 @@ function create_repeated_quest_data(name, repetitions, skillName, difficulty){
         )
     }
 
-    return {skillName, name, completed: false,
+    return {skillName, completed: false,
         config:{
             taskMode: "repeated",
             difficulty,
-            repetitions,
+            number,
+            duration: duration,
         }
     }
 }
 
 //MODEL
-function create_milestone_quest_data(name, skillName, difficulty){
+function create_milestone_quest_data({name, skillName, difficulty}){
     const valid_difficulties = ["easy", "normal", "hard"];
     if (!valid_difficulties.includes(difficulty)){
         throw new Error(
@@ -107,7 +108,7 @@ function create_milestone_quest_data(name, skillName, difficulty){
 }
 
 //MODEL
-function create_timed_quest_data(name, skillName, duration, difficulty){
+function create_timed_quest_data({name, skillName, duration, difficulty}){
     duration = Number(duration)
     if (!Number.isFinite(duration) || duration < 1){
         throw new Error (

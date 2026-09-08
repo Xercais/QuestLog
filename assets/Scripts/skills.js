@@ -11,7 +11,6 @@ let skills = {}
 //skillName is acquired from the checkboxes, function can be found in initialize_quest_listeners() in questTracking.js
 function increase_skill_xp(skillName, xp_to_add){
     skills[skillName].xp += xp_to_add;
-    save_skills();
 }
 
 function iterate_through_skills(){
@@ -46,13 +45,6 @@ function add_skill(skillName){
 function rename_skill(oldName, newName){
     skills[newName] = skills[oldName];
     quests[newName] = quests[oldName];
-
-    remove_skill_data(oldName);
-    save_skills();
-    render_manage_skills_modal(get_all_skill_info(skills));
-    render_all_skills(get_all_skill_info(skills));
-    render_quest_board(get_all_quest_data(quests));
-    
 }
 
 function validate_skill_name(skillName){
@@ -83,14 +75,6 @@ function construct_new_skill(skillName){
     skills[skillName] = {xp: 0}
 }
 
-function manage_skills_coordinator(){
-    let button = document.getElementById('manage-skills');
-
-    button.onclick = () => {
-    render_manage_skills_modal(get_all_skill_info())
-    }
-}
-
 //MODEL
 function remove_skill_data(skillName){
     delete skills[skillName];
@@ -100,14 +84,7 @@ function remove_skill_data(skillName){
 //MODEL
 function delete_skill(skillName){
     if (skills[skillName]){
-        remove_skill_data(skillName)
-        save_skills();
-        save_quests();
-
-        render_all_skills(get_all_skill_info(skills));
-        render_quest_board(get_all_quest_data(quests));
-        initialize_quest_listeners();
-        render_manage_skills_modal(get_all_skill_info(skills))
+        remove_skill_data(skillName);
         return {success: true,}
     } else {
         return{success: false, 
@@ -115,3 +92,4 @@ function delete_skill(skillName){
         }
     }
 }
+
