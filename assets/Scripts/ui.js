@@ -235,11 +235,11 @@ function add_skills_logic(){
     })
 
     add.onclick = () => {
-        add_skill_controller(skill_input, tasks_input, task_mode);
+        add_skill_controller(skill_input, tasks_input, task_mode, content);
     }
 }
 
-function add_skill_controller(name, number, mode){
+function add_skill_controller(name, number, mode, modal){
     let result = validate_skill_name(name.value)
         if (!result.success){
             failure_popup(result.reason)
@@ -251,8 +251,8 @@ function add_skill_controller(name, number, mode){
             save_and_render_controller();
             render_manage_skills_modal(get_all_skill_info())
             
-            input.value = ""
-            content.classList.add('hidden');
+            name.value = ""
+            modal.classList.add('hidden');
         }
 }
 
@@ -272,6 +272,7 @@ function create_milestone_task_modal(){
 
     taskLabel.setAttribute('for', 'name-input');
 
+    inputContainer.classList.add('popup-label');
     inputContainer.append(taskLabel);
     inputContainer.append(nameInput);
 
@@ -281,14 +282,11 @@ function create_milestone_task_modal(){
         getData() {
             return {
                 mode: "milestone",
-                name: nameInput.value.trim()
+                name: title_case(nameInput.value.trim())
             };
         },
         focus() {
             nameInput.focus();
-        },
-        getInput() {
-            return nameInput;
         },
         isEmpty() {
             return nameInput.value.trim() === "";
@@ -304,16 +302,76 @@ function create_milestone_task_modal(){
 }
 
 function create_timed_task_modal(){
-    
+    let taskLabel = create_text_element({element: 'label', text: "Task Name"});
+    let nameInput = create_input({type: 'text', placeholder: "Enter task name", id: 'name-input'});
+    let timeInput = create_input({type: 'number', placeholder: 'mins', id: 'time-input'});
+    let inputContainer = create_section({element: 'div', class_to_add: 'task-input-row'});
+
+    nameInput.addEventListener('focus', () => {
+        nameInput.select();
+    });
+
+    taskLabel.setAttribute('for', 'name-input');
+
+    inputContainer.append(taskLabel);
+    inputContainer.append(nameInput);
+    inputContainer.append(timeInput);
+
+    let returnObject = {
+        mode: "timed",
+        element: inputContainer,
+        getData() {
+            return {
+                mode: "timed",
+                name: nameInput.value.trim(),
+                duration: Number(timeInput.value)
+            };
+        },
+        focus() {
+            nameInput.focus();
+        },
+        isEmpty() {
+            return nameInput.value.trim() === "";
+        },
+        clear() {
+            nameInput.value = "";
+            timeInput.value = '';
+        },
+        setName(newName) {
+            nameInput.value = newName;
+        },
+        setTime(newTime){
+            timeInput.value = newTime;
+        }
+    }
+    return returnObject;
+}
+
+function create_modal(){
+    const popup = clear_container({element: '#create-task-modal', willReveal: true});
+
+    return {
+        setContent(element){
+            popup.append(element);
+        },
+
+        close(){
+            popup.classList.add('hidden');
+        }
+    }
 }
 
 //CONTROLLER
 function task_modal_controller(mode){
     let builder;
+    const modal = create_modal();
 
     switch (mode){
         case "milestone":
             builder = create_milestone_task_modal();
+            break;
+        case "timed":
+            builder = create_timed_task_modal();
             break;
     }
     modal.setContent(builder.element);
@@ -392,11 +450,7 @@ function render_manage_skill_row(skillInfo){
 
     task_manage_button.addEventListener('click', ()=> {
         let questData = quests[skillInfo.name]
-        if (questData.mode !== "repeated"){
-        choose_nameable_tasks_modal(questData);
-    } else {
-        render_repeated_tasks_modal(questData);
-    }
+        choose_tasks_modal(questData);
     })
 
     skill_actions.append(rename_button)
@@ -410,7 +464,7 @@ function render_manage_skill_row(skillInfo){
 }
 
 //CONTROLLER
-function choose_nameable_tasks_modal(questData){
+function choose_tasks_modal(questData){
     const popup = clear_container({element: '#tasks-modal', willReveal: true});
 
     switch (questData.mode){
@@ -421,6 +475,9 @@ function choose_nameable_tasks_modal(questData){
         case "timed":
             render_timed_tasks_modal(questData);
             break;
+        case "repeated":
+            render_repeated_tasks_modal(questData);
+            break;
     }
 
     return popup;
@@ -429,59 +486,20 @@ function choose_nameable_tasks_modal(questData){
 //COMPONENT
 function render_milestone_tasks_modal(questData){
     const popup = document.getElementById('tasks-modal');
-
+    popup.replaceChildren();
     let buttons_section = create_section({element: 'div', class_to_add: 'popup-buttons'});
-    
     let exit_button = create_button("Exit");
+    let add_button = create_button("+ Add Task");
+
     exit_button.addEventListener('click', () => {
         popup.classList.add('hidden');
     })
-
-    let add_button = create_button("+ Add Task");
     add_button.addEventListener('click', () => {
-        let create_task_modal = clear_container({element: '#create-task-modal', willReveal: true});
-        let modal_header = create_text_element({element: 'h2', text: "New Task"});
-        let task_name = create_input({type: 'text', placeholder: "Enter Task Name"});
-        let confirm_button = create_button("Confirm");
-        let cancel_button = create_button("Cancel");
-        let button_section = create_section({element: 'div', class_to_add: 'popup-buttons'});
-
-        confirm_button.addEventListener('click', () => {
-            add_milestone_task_controller(questData, task_name, create_task_modal);
-        })
-
-        cancel_button.addEventListener('click', () => {
-            create_task_modal.classList.add('hidden');
-        })
-
-        button_section.append(confirm_button);
-        button_section.append(cancel_button);
-
-        create_task_modal.append(modal_header);
-        create_task_modal.append(task_name);
-        create_task_modal.append(button_section);
+        create_task_controller(questData, create_milestone_task_modal());
     })
     
     for (let i = 0; i < questData.tasks.length; i++){
-        let task_container = create_section({element: 'div', class_to_add: 'manage-skill-skill-row'})
-        let taskName = create_text_element({element: 'p', text: milestone_task_text_controller(questData, i)})
-        let rename_button = create_button("Rename\nTask")
-        let remove_button = create_button("Remove\nTask")
-
-        rename_button.addEventListener('click', () => {
-            render_rename_task_modal(questData.tasks[i]);
-        })
-      
-        remove_button.addEventListener('click', () => {
-            remove_button.parentElement.remove();
-            remove_task_controller({questData, index: i})
-        })
-
-        task_container.append(taskName);
-        task_container.append(rename_button);
-        task_container.append(remove_button);
-
-        popup.append(task_container);
+        popup.append(create_task_rows_controller(questData, i));
     }
     buttons_section.append(add_button);
     buttons_section.append(exit_button);
@@ -489,54 +507,124 @@ function render_milestone_tasks_modal(questData){
     popup.append(buttons_section);
 }
 
-function milestone_task_text_controller(questData, index){
-    let taskname;
-    if (!questData.tasks[i].name){
-            taskname = "Unnamed Task";
-        } else {
-            taskname = questData.tasks[index].name;
-        }
-    return taskname;
-}
+function create_task_controller(questData, component){
+    let modal = create_modal();
+    let buttons = create_modal_buttons_section();
 
-function add_milestone_task_controller(questData, name, popup){
-    questData.tasks.push({skillName: questData.tasks[0].skillName, name: title_case(name.value), completed: false});
-    render_milestone_tasks_modal(questData);
-    save_and_render_controller();
-    popup.classList.add('hidden');
-}
-
-//COMPONENT
-function render_rename_task_modal(questData){
-    const popup = clear_container({element:'#rename-task-modal', willReveal: true})
-    let input = create_input({type: 'text', id: 'rename-task-input'});
-    let heading = create_text_element({element: 'h2', text: "Rename Skill"});
-
-    let confirm_button = create_button('Confirm')
-    let cancel_button = create_button('Cancel')
-    let buttons_section = create_section({element: 'div', class_to_add: 'modal-buttons'});
-
-    confirm_button.addEventListener('click', () => {
-        confirm_rename_controller(questData, input, popup);
+    buttons.onConfirm(() => {
+        add_task_controller(questData, component.getData(), modal);
     })
 
-    cancel_button.addEventListener('click', () => {
-        popup.classList.add('hidden');
+    buttons.onCancel(() => {
+        modal.close();
+        component.clear();
     })
+
+    component.element.append(buttons.element)
+    modal.setContent(component.element);
+}
+
+function create_modal_buttons_section(){
+    let confirm_button = create_button("Confirm");
+    let cancel_button = create_button("Cancel");
+    let buttons_section = create_section({element: 'div', class_to_add: 'popup-buttons'});
 
     buttons_section.append(confirm_button);
     buttons_section.append(cancel_button);
 
-    popup.append(heading);
-    popup.append(input);
-    popup.append(buttons_section);
+    return {
+        element: buttons_section,
+        onConfirm(callback){
+            confirm_button.onclick = callback;
+        },
+        onCancel(callback){
+            cancel_button.onclick = callback;
+        }
+    }
+}
+
+function create_task_row({task, onRename, onRemove}){
+    let task_container = create_section({element: 'div', class_to_add: 'manage-skill-skill-row'})
+    let taskName = create_text_element({element: 'p', text: get_task_display_text(task)})
+    let rename_button = create_button("Rename\nTask")
+    let remove_button = create_button("Remove\nTask")
+
+    rename_button.onclick = onRename;
+    remove_button.onclick = onRemove;
+    
+    task_container.append(taskName);
+    task_container.append(rename_button);
+    task_container.append(remove_button);
+
+    return task_container;
+}
+
+function get_task_display_text(task){
+    if (task.name && task.config?.duration){
+        return `${task.name}\n (${task.config.duration} min)`;
+    }
+
+    if (task.name) {
+        return task.name;
+    }
+
+    return "Unnamed\nTask";
+}
+
+function create_task(data, skillName){
+    let task = {skillName,
+        completed: false,
+        config: {}
+    };
+
+    switch (data.mode){
+        case "milestone":
+            task.name = data.name;
+            break;
+        case "timed":
+            task.name = data.name;
+            task.config.duration = data.duration;
+            break;
+        case "repeated":
+            task.config.number = data.number;
+            task.config.duration = data.duration;
+    }
+
+    return task;
+}
+
+function add_task_controller(questData, taskData, popup){
+    questData.tasks.push(create_task({taskData, skillname: questData.skillName}));
+    render_milestone_tasks_modal(questData);
+    save_and_render_controller();
+    popup.close();
+}
+
+//COMPONENT
+function render_rename_task_modal(questData){
+    const popup = create_modal();
+    let input = create_input({type: 'text', id: 'rename-task-input'});
+    let heading = create_text_element({element: 'h2', text: "Rename Task"});
+    let buttons = create_modal_buttons_section();
+
+    buttons.onConfirm(() => {
+        confirm_rename_controller(questData, input, popup);
+    })
+
+    buttons.onCancel(() => {
+        popup.close();
+    })
+
+    popup.setContent(heading);
+    popup.setContent(input);
+    popup.setContent(buttons.element);
 }
 
 function confirm_rename_controller(questData, input, popup){
-    popup.classList.add('hidden');
+    popup.close();
     questData.name = title_case(input.value);
-    save_and_render_controller()
-    choose_nameable_tasks_modal(quests[questData.skillName]);
+    save_and_render_controller();
+    choose_tasks_modal(quests[questData.skillName]);
 }
 
 //COMPONENT
@@ -548,104 +636,39 @@ function render_timed_tasks_modal(questData){
     let buttons_section = create_section({element: 'div', class_to_add: 'popup-buttons'});
 
     add_button.addEventListener('click', () => {
-        let create_task_modal = clear_container({element: '#create-task-modal', willReveal: true})
-        create_task_modal.classList.add('popup-label');
-
-        let modal_header = create_text_element({element: 'h2', text: "New Task"});
-        let task_name = create_input({type: 'text', placeholder: "Enter Task Name"});
-        let task_duration = create_input({type: 'number', placeholder: 'Min'});
-        let confirm_button = create_button("Confirm");
-        let cancel_button = create_button("Cancel");
-        let button_section = create_section({element: 'div', class_to_add: 'popup-buttons'});
-
-        task_name.addEventListener('focus', (event) => {
-            event.target.select();
-        })
-
-        confirm_button.addEventListener('click', () => {
-            add_timed_task_controller({questData, taskName: title_case(task_name.value), duration: task_duration.value, modal: create_task_modal})
-            
-        })
-
-        cancel_button.addEventListener('click', () => {
-            create_task_modal.classList.add('hidden');
-        })
-
-        button_section.append(confirm_button);
-        button_section.append(cancel_button);
-
-        create_task_modal.append(modal_header);
-        create_task_modal.append(task_name);
-        create_task_modal.append(task_duration);
-        create_task_modal.append(button_section);
-
+        create_task_controller(questData, create_timed_task_modal());
     })
 
     exit_button.addEventListener('click', () => {
         popup.classList.add('hidden');
     })
 
-    //left off here
     for (let i = 0; i <questData.tasks.length; i++){
-        let task_container = create_section({element: 'div', class_to_add: 'manage-skill-skill-row'});
-        let task_name = create_text_element({element: 'p', text: questData.tasks[i].name  || "Unnamed Task"})
-        let remove_button = create_button("Remove Task");
-        let edit_button = create_button("Edit Task");
-
-        task_name.textContent += ` (${questData.tasks[i].config.duration} min)`
-
-        remove_button.addEventListener('click', () => {
-            remove_button.parentElement.remove();
-            remove_task_controller({questData, index: i});
-        })
-
-        edit_button.onclick = () => {
-            let edit_popup = clear_container({element: '#edit-task-modal', willReveal: true})
-            edit_popup.classList.add('popup-label');
-
-            let task_label = create_text_element({element: 'h2', text: questData.tasks[i].name || "Unnamed Task"})
-            let task_duration = create_text_element({element: 'p', text: `${questData.tasks[i].config.duration} min`})
-            let new_name = create_input({type: 'text', value: questData.tasks[i].name})
-            let new_duration = create_input({type: 'number'})
-            let edit_buttons_section = create_section({element: 'div', class_to_add: 'popup-buttons'});
-            let confirm_button = create_button("Confirm");
-            let cancel_button = create_button("Cancel");
-
-            confirm_button.addEventListener('click', () => {
-                edit_timed_task_controller({questData, name: title_case(new_name), duration: new_duration, index: i, modal: edit_popup});
-            })
-
-            cancel_button.addEventListener('click', () => {
-                edit_popup.classList.add('hidden');
-            })
-
-            edit_buttons_section.append(confirm_button);
-            edit_buttons_section.append(cancel_button);
-
-            edit_popup.append(task_label);
-            edit_popup.append(task_duration);
-            edit_popup.append(new_name);
-            edit_popup.append(new_duration);
-            edit_popup.append(edit_buttons_section);
+        popup.append(create_task_rows_controller(questData, i))
         }
-
-        task_container.append(task_name);
-        task_container.append(remove_button);
-        task_container.append(edit_button);
-
-        buttons_section.append(add_button);
-        buttons_section.append(exit_button);
-
-        popup.append(task_container);
-    }
+    
     popup.append(buttons_section);
+}
+
+function create_task_rows_controller(questData, i){
+    let element = create_task_row({task: questData.tasks[i],
+        onRename(){
+            render_rename_task_modal(questData.tasks[i])
+        },
+        onRemove(){
+            remove_task_controller({questData, index: i})
+            render_milestone_tasks_modal(questData)
+            save_and_render_controller();
+        }
+    });
+    return element;
 }
 
 function add_timed_task_controller({questData, name, duration, modal}){
     questData.tasks.push({skillName: questData.tasks[0].skillName, name: title_case(name), duration:duration, completed: false});
     save_and_render_controller();
     modal.classList.add('hidden');
-    choose_nameable_tasks_modal(questData);
+    choose_tasks_modal(questData);
 }
 
 function edit_timed_task_controller({questData, name, duration, index, modal}){
@@ -653,7 +676,7 @@ function edit_timed_task_controller({questData, name, duration, index, modal}){
     questData.tasks[index].duration = duration;
     save_and_render_controller();
     modal.classList.add('hidden');
-    choose_nameable_tasks_modal(questData);
+    choose_tasks_modal(questData);
 }
 
 function remove_task_controller({questData, index}){

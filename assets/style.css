@@ -79,7 +79,7 @@
 }
 
 .quest-task {
-    min-width: 80px;
+    width: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
