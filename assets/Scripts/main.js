@@ -24,16 +24,15 @@ update_xp_display();
 let streak = 0;
 let bestStreak = 0;
 load_streak();
+
+load_skills();
+load_quests();
+
 check_for_reset();
+
 update_streak_display();
 update_bestStreak_display();
 
- 
-//===========================
-//Startup
-//===========================
-load_skills();
-load_quests();
 render_all_skills(get_all_skill_info());
 render_quest_board(get_all_quest_data());
 initialize_quest_listeners();

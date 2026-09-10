@@ -30,6 +30,7 @@ function check_for_reset(){
     } if(last_reset === today){
         return;
     } else {
+        console.log("check_for_reset", quests);
         daily_reset();
         save_date(today);
     }
@@ -38,6 +39,7 @@ function check_for_reset(){
 
 //MODEL
 function daily_reset(){
+    console.log(JSON.stringify(quests, null, 2));
     localStorage.setItem("task_completion_snapshot", JSON.stringify(get_all_task_completion_states()))
     check_if_streak_increments();
     
@@ -48,4 +50,5 @@ function daily_reset(){
     });
 
     save_quests();
+    console.log(JSON.stringify(quests, null, 2));
 }

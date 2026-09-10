@@ -35,6 +35,8 @@ function compare_to_best_streak(streak){
         save_current_bestStreak(streak)
     } else if (parseInt(best_streak) < streak) {
         save_current_bestStreak(streak)
+        bestStreak = streak;
+        update_bestStreak_display();
     } else {
         return
     }
