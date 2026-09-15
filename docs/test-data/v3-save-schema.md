@@ -1,0 +1,9 @@
+Questlog V3 Save Structure
+
+best_streak
+current_streak
+current_xp
+last_reset_day
+quests
+skills
+task_completion_snapshot
