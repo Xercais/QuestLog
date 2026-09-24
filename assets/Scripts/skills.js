@@ -93,3 +93,13 @@ function delete_skill(skillName){
     }
 }
 
+function set_skills_for_testing(testSkills){
+    skills = testSkills;
+}
+
+if (typeof module !== "undefined"){
+    module.exports = {
+        validate_skill_name,
+        set_skills_for_testing
+    }
+}
