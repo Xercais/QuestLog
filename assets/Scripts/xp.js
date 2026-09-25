@@ -133,3 +133,11 @@ function apply_xp_controller(skillName, xpBundle){
     increase_XP_controller(xpBundle.globalXPtoAdd);
     increase_skill_xp(skillName, xpBundle.skillXPtoAdd);
 }
+
+if (typeof module !== "undefined"){
+    module.exports = {
+        calculate_level,
+        apply_task_xp,
+        apply_duration_multiplier
+    }
+}

@@ -589,6 +589,7 @@ function create_task({data, skillName}){
             task.config.number = data.number;
             task.config.duration = data.duration;
     }
+    task.config.mode = data.mode
 
     return task;
 }
@@ -749,4 +750,10 @@ function render_manage_modal_buttons(){
     button_row.append(close_manage_modal);
     
     return button_row;
+}
+
+if (typeof module !== "undefined"){
+    module.exports = {
+        create_task
+    }
 }
